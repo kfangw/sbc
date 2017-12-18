@@ -1,0 +1,5 @@
+flake8==3.5.0
+Flask==0.12.2
+pyflakes==1.6.0
+requests==2.18.4
+urllib3==1.22
