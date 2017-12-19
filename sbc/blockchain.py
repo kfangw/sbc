@@ -2,13 +2,14 @@ import hashlib
 import json
 from time import time
 from urllib.parse import urlparse
+from uuid import uuid4
 
 import requests
 
 
 class Blockchain:
     def __init__(self):
-        self.current_transactions = []
+        self.current_transactions = {}
         self.chain = []
         self.nodes = set()
 
@@ -106,27 +107,27 @@ class Blockchain:
         }
 
         # Reset the current list of transactions
-        self.current_transactions = []
+        self.current_transactions = {}
 
         self.chain.append(block)
         return block
 
-    def new_transaction(self, sender, recipient, amount):
-        """
-        Creates a new transaction to go into the next mined Block
+    # def new_transaction(self, sender, recipient, amount, tc_code=None):
+    def new_transaction(self, **kwargs):
+        transaction = {
+            key: value for key, value in kwargs.items()
+        }
+        tx_id = str(uuid4()).replace('-', '')
+        self.current_transactions[tx_id] = transaction
 
-        :param sender: Address of the Sender
-        :param recipient: Address of the Recipient
-        :param amount: Amount
-        :return: The index of the Block that will hold this transaction
-        """
-        self.current_transactions.append({
-            'sender': sender,
-            'recipient': recipient,
-            'amount': amount,
-        })
+        return tx_id, self.last_block['index'] + 1
 
-        return self.last_block['index'] + 1
+    def get_transaction(self, tx_id):
+        for block in self.chain:
+            for key, value in block['transactions'].items():
+                if tx_id == key:
+                    return value
+        return None
 
     @property
     def last_block(self):
